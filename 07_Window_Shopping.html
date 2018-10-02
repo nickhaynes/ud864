@@ -1,0 +1,145 @@
+<html>
+ <head>
+ <!-- styles put here, but you can include a CSS file and reference it instead! -->
+   <style type="text/css">
+     html, body { height: 100%; margin: 0; padding: 0; }
+     #map { 
+      bottom:0px;
+      height: 100%;
+      left: 362px;
+      position: absolute;
+      right: 0px;
+    }
+
+    .options-box {
+      background:#fff;
+      border: 1px solid #999;
+      border-radius: 3px;
+      height: 100%;
+      line-height: 35px;
+      padding: 10px 10px 30px 10px;
+      text-align: left;
+      width: 340px;
+    }
+   </style>
+ </head>
+ <body>
+  <div class="container">
+    <div class="options-box">
+      <h1>Favorite Spots of New Zealand</h1>
+      <div>
+        <input id="show-places" type="button" value="Show Places">
+        <input id="hide-places" type="button" value="Hide Places">
+      </div>
+    </div>
+   <div id="map"></div>
+  </div>
+
+   <script>
+     var map;  
+
+     // Create the array for all location markers
+     var markers = [];
+
+     function initMap() {
+       map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: -36.848461, lng: 174.763336 },
+        zoom: 13
+       });
+
+       // Here is an array of locations.  The lats and longs were retrieved from Google Maps.
+
+       var locations = [
+          {
+            title: 'Wellington',
+            location: { lat:-41.2779677, lng:174.7762653 }
+          },
+          {
+            title: 'Christchurch',
+            location: { lat:-43.5122914, lng:172.3189066 }
+          },
+          {
+            title: 'Dunedin',
+            location: { lat:-45.8723691, lng:170.3870385 }
+          },
+          {
+            title: 'Mount Aspiring',
+            location: { lat:-44.3807306, lng:168.6117143 }
+          },
+          {
+            title: 'New Plymouth',
+            location: { lat:-39.0523599, lng:174.0260861 }
+          },
+          {
+            title: 'Auckland',
+            location: { lat:-36.8484608, lng:174.3050782 }
+          }
+       ];
+
+       var largeInfowindow = new google.maps.InfoWindow();
+       var bounds = new google.maps.LatLngBounds();
+       // This function will make markers for all entities in the locations array.
+       for (var i = 0; i < locations.length; i++) {
+        // Retrieves the info from the object for the marker
+        var position = locations[i].location;
+        var title = locations[i].title;
+        // Creates the marker for the location.
+        var marker = new google.maps.Marker({
+          position: position,
+          title: title,
+          animation: google.maps.Animation.DROP,
+          id: i
+        });
+        // Puts the created marker into an array of markers
+        markers.push(marker);
+        // Extend the boundaries of the map if needed
+        bounds.extend(marker.position);
+        // Gives the marker an infowindow on the click
+        marker.addListener('click', function() {
+          populateInfoWindow(this, largeInfowindow);
+        });
+       }
+
+      document.getElementById('show-places').addEventListener('click', showPlaces);
+      document.getElementById('hide-places').addEventListener('click', hidePlaces);
+
+       // Populate the infowindow on click
+
+       function populateInfoWindow(marker, infowindow) {
+        // Check if infowindow is open
+        if (infowindow.marker != marker) {
+          infowindow.marker = marker;
+          infowindow.setContent('<div>' + marker.title + '</div>');
+          infowindow.open(map, marker);
+          // Make sure marker is cleared if infowindow is closed
+          infowindow.addListener('closeclick', function() {
+            infowindow.setMarker(null);
+          });
+        }
+       }
+
+       // This will show all markers in the markers array
+
+       function showPlaces() {
+        var bounds = new google.maps.LatLngBounds();
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
+          bounds.extend(markers[i].position);
+        }
+        map.fitBounds(bounds);
+       }
+
+       function hidePlaces() {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+       }
+     }
+   </script>
+
+   <script async defer
+        src="https://maps.googleapis.com/maps/api/js?v=weekly&key=AIzaSyD0Duq2Mk8bOIIpDiJh5W9-lmAjXCUPPYA&callback=initMap">
+   </script>
+
+ </body>
+</html>
